@@ -334,11 +334,15 @@ public class YatzyTest {
 
     @Test
     public void given_value_smaller_than_1_when_of_then_throws_an_exception(){
-        assertThrows(IllegalArgumentException.class, () -> Yatzy.of(1, 0, 3, 4, 5));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> Yatzy.of(1, 0, 3, 4, 5));
+        String expectedMsg = String.format(Yatzy.errorMsg, 1, 0, 3, 4, 5);
+        assertEquals(expectedMsg, exception.getMessage());
     }
     @Test
     public void given_value_larger_than_6_when_of_then_throws_an_exception(){
-        assertThrows(IllegalArgumentException.class, () -> Yatzy.of(1, 1, 31, 4, 5));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> Yatzy.of(1, 1, 31, 4, 5));
+        String expectedMsg = String.format(Yatzy.errorMsg, 1, 1, 31, 4, 5);
+        assertEquals(expectedMsg, exception.getMessage());
     }
 
 }
