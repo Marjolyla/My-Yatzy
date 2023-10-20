@@ -1,10 +1,14 @@
 package com.mda;
 
+import java.util.Arrays;
+
 /**
  * The class get the score of a yatzy game.
  */
 public class Yatzy {
 
+    public static final int DIE_MAX = 6;
+    public static final int DIE_MIN = 1;
     /**
      * This table of int represent the game.
      */
@@ -32,12 +36,16 @@ public class Yatzy {
      * @return Yatzy that represent the game
      */
     public static Yatzy of(int d1, int d2, int d3, int d4, int d5){
-        boolean allValid = (d1 <= 6 && d1 > 0) && (d2 <= 6 && d2 > 0) && (d3 <= 6 && d3 > 0) &&
-                (d4 <= 6 && d4 > 0) && (d5 <= 6 && d5 > 0) ;
+        boolean allValid = (d1 <= DIE_MAX && d1 >= DIE_MIN)
+                && (d2 <= DIE_MAX && d2 >= DIE_MIN)
+                && (d3 <= DIE_MAX && d3 >= DIE_MIN)
+                && (d4 <= DIE_MAX && d4 >= DIE_MIN)
+                && (d5 <= DIE_MAX && d5 >= DIE_MIN) ;
         if (allValid) {
             return new Yatzy(d1, d2, d3, d4, d5);
         }
-        throw new IllegalArgumentException("All the dice must be between 1 and 6; your dice: " +
+        throw new IllegalArgumentException("All the dice must be between "+DIE_MIN+" and "
+                +DIE_MAX+"; your dice: " +
                 d1 + ", " + d2 + ", " + d3 + ", " + d4 + ", " + d5 + "." );
     }
 
@@ -47,7 +55,7 @@ public class Yatzy {
      */
     public int chance()
     {
-        return dice[0] + dice[1] + dice[2] + dice[3] + dice[4];
+        return Arrays.stream(dice).sum();
     }
 
     /**
@@ -57,12 +65,8 @@ public class Yatzy {
     public int yatzy()
     {
         int first = dice[0];
-        for (int die : dice) {
-            if (die != first) {
-                return 0;
-            }
-        }
-        return 50;
+        boolean anyDifference = Arrays.stream(dice).anyMatch(die -> die != first);
+        return anyDifference ? 0 : 50;
     }
 
     /**
@@ -71,13 +75,7 @@ public class Yatzy {
      * @return the score
      */
     private int sumIfValuesEqualsRef(int ref){
-        int result = 0;
-        for (int die : dice) {
-            if (ref == die) {
-                result += ref;
-            }
-        }
-        return result;
+        return Arrays.stream(dice).filter(die -> die == ref).sum();
     }
 
     /**
@@ -137,13 +135,10 @@ public class Yatzy {
      * @return the score
      */
     private int sumByNumberOfIterations(int it){
-        int[] counts = new int[dice.length+1];
-        for (int die : dice) {
-            counts[die - 1]++;
-        }
-        for (int at = dice.length; at >= 0; at--) {
-            if (counts[at] >= it) {
-                return (at + 1) * it;
+        int[] counts = getCounts();
+        for (int at = DIE_MAX; at >= DIE_MIN; at--) {
+            if (counts[at-1] >= it) {
+                return (at) * it;
             }
         }
         return 0;
@@ -165,27 +160,18 @@ public class Yatzy {
     public int twoPairs()
     {
         int[] counts = getCounts();
-        int n = 0;
-        int score = 0;
-        for (int i = dice.length; i >0 ; i--) {
-            if (counts[i] >= 2) {
-                n++;
-                score += (i + 1);
-            }
-        }
-        if (n == 2) {
-            return score * 2;
-        } else {
+        if (Arrays.stream(counts).filter(count-> count >= 2).count() < 2)
             return 0;
-        }
+        return Arrays.stream(dice).map(die -> counts[die-1] >= 2 ? die : 0).sum();
     }
 
     /**
      * This method count iterations of each die
+     *
      * @return a table of all iteration
      */
     private int[] getCounts() {
-        int[] counts = new int[dice.length+1];
+        int[] counts = new int[]{0,0,0,0,0,0};
         for (int die : dice) {
             counts[die - 1]++;
         }
@@ -219,16 +205,7 @@ public class Yatzy {
      * @return the result
      */
     private boolean checkStraightBetween(int start, int end){
-        int[] tallies = new int[6];
-        for (int die : dice) {
-            tallies[die - 1] += 1;
-        }
-        for(int i = start; i <= end; i++) {
-            if (tallies[i] != 1) {
-                return false;
-            }
-        }
-        return true;
+        return Arrays.stream(dice).allMatch(die -> die >= start && die <= end);
     }
 
     /**
@@ -237,7 +214,7 @@ public class Yatzy {
      */
     public int smallStraight()
     {
-        return checkStraightBetween(0, 4) ? 15 : 0;
+        return checkStraightBetween(1, 5) ? 15 : 0;
     }
 
     /**
@@ -246,7 +223,7 @@ public class Yatzy {
      */
     public int largeStraight()
     {
-        return checkStraightBetween(1, 5) ? 20 : 0;
+        return checkStraightBetween(2, 6) ? 20 : 0;
     }
 
     /**
@@ -257,20 +234,10 @@ public class Yatzy {
     public int fullHouse()
     {
         int[] tallies = getCounts();
-        int twiceAt = 0;
-        int thriceAt = 0;
+        if (Arrays.stream(tallies).noneMatch(count -> count == 3)
+                || Arrays.stream(tallies).noneMatch(count -> count == 2))
+            return 0;
 
-        for (int i = 0; i != dice.length+1; i += 1) {
-            if (tallies[i] == 2) {
-                twiceAt = i + 1;
-            } else if (tallies[i] == 3) {
-                thriceAt = i + 1;
-            }
-        }
-
-        if (twiceAt > 0 && thriceAt > 0) {
-            return twiceAt * 2 + thriceAt * 3;
-        }
-        return 0;
+        return Arrays.stream(dice).sum();
     }
 }
