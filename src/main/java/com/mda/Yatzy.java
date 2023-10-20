@@ -9,7 +9,7 @@ public class Yatzy {
 
     public static final int DIE_MAX = 6;
     public static final int DIE_MIN = 1;
-    public static String errorMsg = "All the dice must be between "+DIE_MIN+" and "+DIE_MAX+"; your dice: %s, %s, %s, %s, %s" ;
+    public static String ILLEGAL_ARGUMENT_MSG_ERROR = "All the dice must be between "+DIE_MIN+" and "+DIE_MAX+"; your dice: %s, %s, %s, %s, %s" ;
     /**
      * This table of int represent the game.
      */
@@ -45,7 +45,7 @@ public class Yatzy {
         if (allValid) {
             return new Yatzy(d1, d2, d3, d4, d5);
         }
-        throw new IllegalArgumentException(String.format(errorMsg, d1, d2, d3, d4, d5));
+        throw new IllegalArgumentException(String.format(ILLEGAL_ARGUMENT_MSG_ERROR, d1, d2, d3, d4, d5));
     }
 
     /**
