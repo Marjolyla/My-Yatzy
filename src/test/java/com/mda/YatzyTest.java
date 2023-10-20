@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class YatzyTest {
 
@@ -329,6 +330,19 @@ public class YatzyTest {
         int result = game.fullHouse();
         int expected = 0;
         assertEquals(expected, result, "The result should be " + expected);
+    }
+
+    @Test
+    void given_value_smaller_than_1_when_of_then_throws_an_exception(){
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> Yatzy.of(1, 0, 3, 4, 5));
+        String expectedMsg = "All the dice must be between 1 and 6; your dice: 1, 0, 3, 4, 5.";
+        assertEquals(expectedMsg, exception.getMessage());
+    }
+    @Test
+    void given_value_larger_than_6_when_of_then_throws_an_exception(){
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> Yatzy.of(1, 1, 31, 4, 5));
+        String expectedMsg = "All the dice must be between 1 and 6; your dice: 1, 1, 31, 4, 5.";
+        assertEquals(expectedMsg, exception.getMessage());
     }
 
 }

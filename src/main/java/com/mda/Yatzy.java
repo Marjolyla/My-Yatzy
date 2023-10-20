@@ -32,8 +32,8 @@ public class Yatzy {
      * @return Yatzy that represent the game
      */
     public static Yatzy of(int d1, int d2, int d3, int d4, int d5){
-        boolean allValid = (d1 <= 6 && d1 > 0) || (d2 <= 6 && d2 > 0) || (d3 <= 6 && d3 > 0) ||
-                (d4 <= 6 && d4 > 0) || (d5 <= 6 && d5 > 0) ;
+        boolean allValid = (d1 <= 6 && d1 > 0) && (d2 <= 6 && d2 > 0) && (d3 <= 6 && d3 > 0) &&
+                (d4 <= 6 && d4 > 0) && (d5 <= 6 && d5 > 0) ;
         if (allValid) {
             return new Yatzy(d1, d2, d3, d4, d5);
         }
